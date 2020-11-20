@@ -93,3 +93,23 @@ verb                   描述
 
 \t 制表符 \n 换行符
 ```
+
+## 嵌套 map 出现panic: assignment to entry in nil map 报错
+* 嵌套map m := make(map[string]map[string]int) // make只初始化的 map[string]T 部分, T 为 map[string]int, T 没有初始化,需要初始化 T
+* [参考](https://blog.csdn.net/jason_cuijiahui/article/details/79410471)
+* 常用做法
+
+```
+m := make(map[string]map[string]int)
+if m[s] == nil {
+    m[s] = make(map[string]int)
+}
+// 赋值
+m[s][s1] = 1
+```
+
+## ioutil.ReadFile 和 ioutil.ReadAll 的区别
+* ioutil.ReadFile(filename string) ([]byte, err)
+* ioutil.ReadAll(r io.Reader) ([]byte, err)
+* 如果是读取一个文件,那么用 ReadFile,因为它比 ReadAll 快,是因为它先计算了文件的大小,然后初始化对应的 size 大小的 buff,传入 readAll(f, n)来读取字节流
+* 如果是 io.Reader 那么必须用 ReadAll 读取全部内容了,或者用 ioutil.Scanner()来逐行读取

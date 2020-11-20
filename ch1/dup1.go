@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	fmt.Printf("%% %q %q %q", `a`, 'a', "a")  // % "a" 'a' "a"
+	// fmt.Printf("%% %q %q %q", `a`, 'a', "a")  // % "a" 'a' "a"
 	// var counts1 map[string]int // nil
 	counts := make(map[string]int) // map[]
 	// fmt.Printf("%T, %T",counts1, counts)
