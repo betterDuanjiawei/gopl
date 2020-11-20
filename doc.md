@@ -39,7 +39,7 @@ func main() {
         fmt.Println(scanner.Text()) // scanner.Bytes()
     }
 }
-// 对于scanner.Scan()的用法相当于其他语言的迭代器iterator,并且把迭代器指向的数据放到新的缓冲区中,新的缓冲区可以通过scanner.Text()或 scanner.Bytes()获取到
+// 对于scanner.Scan() 读取下一行,并将结尾的换行符去掉,Scan() 在读取到内容时返回true, 没有更多内容时候返回 false; 用法相当于其他语言的迭代器iterator,并且把迭代器指向的数据放到新的缓冲区中,新的缓冲区可以通过scanner.Text()或 scanner.Bytes()获取到
 scanner.Scan()默认是以\n(换行符)作为分隔符.如果想要指定分割符,Go 提供了4种ScanBytes(返回单个字节作为 token),ScanLines(返回一行文本)(默认),ScanRunes(返回单个 utf8编码的 rune作为一个token);ScanWords(返回通过空格分割的单词)
 
 ```
@@ -49,3 +49,47 @@ os.Exit(x) 立即进行给定状态(非零状态)的退出
 return:结束当前函数,并返回指定值
 runtime.Goexit:结束当前 goroutine,其他 goroutine不受影响,主程序也不受影响
 os.Exit():结束当前程序,不管三七二十一
+
+## 内置函数 print() println()
+print()在 go中是属于输出到标准错误流中并打印,官方不建议写程序时候使用它,可以在 debug时候用
+println() 每次输出都会自动加换行
+
+## fmt包Printf Sprintf Fprintf的区别
+xxxf 格式化
+xxxln 换行 ln 其实是 使用%v格式化之后,在最后追加换行符
+
+fmt.Print 是属于标准输出流,一般使用它进行屏幕输出 不接受任何格式化操作
+fmt.Printf 格式化输出,只可以输出字符串类型的变量
+fmt.Println 输出后换行
+
+fmt.Sprint 采用默认格式将参数格式化,串联所有输出生成并返回一个字符串,如果两个相邻的参数都不是字符串,会在它们的输出之间添加空格
+```
+s1 := fmt.Sprint("abc", "def", 100, true,  "ghy")
+println(s1)
+abcdef100 trueghy
+```
+fmt.Sprintf 返回一个格式化的字符串,它本身只返回数据,不打印屏幕 可以赋值给其他变量
+func Sprintf(format string, a ...interface{}) string
+
+fmt.Fprint Fprint采用默认格式将其参数格式化并写入w。如果两个相邻的参数都不是字符串，会在它们的输出之间添加空格。返回写入的字节数和遇到的任何错误。
+fmt.Fprintf Fprintf根据 format参数生成格式化的字符串并写入 w.返回写入的字节数和遇到的任何错误,是输出到 io.Writer 而不是 os.Stdout
+func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error)
+
+## fmt.Printf 详解
+* fmt.Printf 从一个表达式列表生成格式化的输出,第一个参数是格式化指示字符串, 每一个参数的格式是一个转义字符(verb) = % + 一个字符(特殊含义) 
+* xxxf 格式化函数都以 f 结尾
+```
+verb                   描述
+%d          十进制整数
+%x,%o,%b    十六进制,八进制,二进制
+%f,%g,%e    浮点数,如 3.141593, 3,1415926897755, 3.141593e+00
+%t          布尔型 true/false
+%c          字符 (Unicode码点)
+%s          字符串
+%q          带引号的字符串:"abc" 'a'   fmt.Printf("%% %q %q %q", `a`, 'a', "a")  // % "a" 'a' "a"
+%v          内置格式的任何值
+%T          任何值的类型
+%%          百分号本身
+
+\t 制表符 \n 换行符
+```
