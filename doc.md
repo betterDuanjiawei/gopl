@@ -113,3 +113,10 @@ m[s][s1] = 1
 * ioutil.ReadAll(r io.Reader) ([]byte, err)
 * 如果是读取一个文件,那么用 ReadFile,因为它比 ReadAll 快,是因为它先计算了文件的大小,然后初始化对应的 size 大小的 buff,传入 readAll(f, n)来读取字节流
 * 如果是 io.Reader 那么必须用 ReadAll 读取全部内容了,或者用 ioutil.Scanner()来逐行读取
+
+## flag 包
+* flag.Bool() 创建一个新的 bool标识变量,三个参数:标识的名字n,变量的默认值 false,以及当用户提供非法标识 非法参数或者-h -help参数是输出的消息
+* flag.String() 使用名字 默认值 消息来创建一个新的字符串变量
+* flag.Bool() 和 flag.String() 返回的都是指向标识变量的指针,必须通过*n和*sep来访问
+* flag.Parse() 当程序运行时,在使用标识前,必须调用flag.Parse()来更新标识变量的默认值.如果 flag.Parse()遇到错误,它输出一条帮助信息(和-h -help 输出的信息一样),然后调用os.Exit(2)来结束程序
+* flag.Args() 非标识参数可以从flag.Args()返回的字符串 slice 来访问.
