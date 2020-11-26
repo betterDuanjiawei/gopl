@@ -82,9 +82,9 @@ func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error)
 verb                   描述
 %d          十进制整数
 %x,%o,%b    十六进制,八进制,二进制
-%f,%g,%e    浮点数,如 3.141593, 3,1415926897755, 3.141593e+00
+%f,%g,%e(分别代表无指数形式 自动精度形式 有指数形式)(%8.3f 表示8位宽度,小数点后精确到3位的浮点数)    浮点数,如 3.141593, 3,1415926897755, 3.141593e+00
 %t          布尔型 true/false
-%c          字符 (Unicode码点)
+%c          字符 (Unicode码点) 文字符号
 %s          字符串
 %q          带引号的字符串:"abc" 'a'   fmt.Printf("%% %q %q %q", `a`, 'a', "a")  // % "a" 'a' "a"
 %v          内置格式的任何值
@@ -92,6 +92,8 @@ verb                   描述
 %%          百分号本身
 
 \t 制表符 \n 换行符
+%[1] 重复第一个参数
+%#[1]x #输出相应的前缀
 ```
 
 ## 嵌套 map 出现panic: assignment to entry in nil map 报错
@@ -120,3 +122,12 @@ m[s][s1] = 1
 * flag.Bool() 和 flag.String() 返回的都是指向标识变量的指针,必须通过*n和*sep来访问
 * flag.Parse() 当程序运行时,在使用标识前,必须调用flag.Parse()来更新标识变量的默认值.如果 flag.Parse()遇到错误,它输出一条帮助信息(和-h -help 输出的信息一样),然后调用os.Exit(2)来结束程序
 * flag.Args() 非标识参数可以从flag.Args()返回的字符串 slice 来访问.
+
+## x(T) 类型转换
+* 如果两个类型具有相同的底层类型或者二者都是指向相同底层类型变量的未命名指针类型.则二者是可以相互转换的.
+* 数字类型之间的转换,字符串和一些slice类型间的转换是允许的.
+```
+//var test string = "0" // cannot convert test (type string) to type int
+	var test float64  =  0.0
+	fmt.Println(int(test))
+```
