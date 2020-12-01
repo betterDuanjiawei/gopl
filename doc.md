@@ -1,4 +1,6 @@
 # go 日记
+关于gopl书籍的练习题可以[参考](https://www.cnblogs.com/ling-diary/tag/Go%E7%BB%83%E4%B9%A0%E9%A2%98/)
+
 ## struct{} 和 struct{}{} [参考](http://www.36nu.com/post/329)
 * struct 是 go的关键字 结构体类型, 
 * struct{} 是一个无元素的结构体类型,优点是大小为0,不需要内存来存储struct{}类型的值
@@ -130,4 +132,14 @@ m[s][s1] = 1
 //var test string = "0" // cannot convert test (type string) to type int
 	var test float64  =  0.0
 	fmt.Println(int(test))
+```
+
+## % 取模
+* x%y 如果 x<y,那么结果就是 x,如果x>y,那么结果就是取余数 `fmt.Println(2%5) // 2`
+* 浮点数和整数 取模结果不一样 只要存在浮点数就不会出现精度丢失 `fmt.Println(5.0/4.0, 5/4, 5.0/4, 5/4.0) // 1.25 1 1.25 1.25 `
+
+## xx.ReadRune()
+```
+in := bufio.NewReader(os.Stdin)
+r, n, err := in.ReadRune() // 返回 rune(解码的字符串 unicode.ReplacementChar 不合法的 utf-8字符,长度是1), nbytes(字节长度), error(错误  io.EOF 文件结束, 其他错误)
 ```
