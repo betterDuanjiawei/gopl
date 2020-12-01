@@ -295,10 +295,128 @@ if _, ok := seen[s]; !ok {
     seen[s] = struct{}{}
 }
 ```
-* 结构体字面量:通过设置结构体的成员变量来设置,两种方式:不指定成员名称按顺序赋值,和指定成员名字按需赋值
+* 结构体字面量:通过设置结构体的成员变量来设置,两种方式:不指定成员名称按顺序赋值,和指定成员名字按需赋值,如果第二种初始化的方式中,某个成员变量没有指定,那么它的值就是该成员变量类型的零值. 不可以绕过不可导出变量
 ```
 type Point struct{x,y,z int}
 p := Point{1, 2, 3} //正确的顺序,每个都赋值,不推荐使用,开发和阅读空难,可维护性差
 p2 := Point{x: 1, z:3} // 指定部分或全部成员变量的名称和值来初始化结构体变量.因为指定了成员变量的名字,所以他们的顺序无所谓的
 ```
+* 出于效率的考虑,大型的结构体通常都使用结构体指针的方式直接传递给函数或从函数中返回,在修改结构体内容的时候是必需的.go 是按值调用的语言,调用函数接收到的是实参的一个副本,并不是实参的引用
+* 由于结构体通常都是通过指针方式使用,创建 初始化一个 struct 类型的变量,并获取它的地址
+```
+pp := &Point{1, 2} // 可以直接使用在一个表达式中,如函数调用
+
+pp := new(Point)
+*pp := Point{1, 2}
+```
+### 结构体比较
+* 如果结构体的成员变量都可以比较,那么这个结构体就是可比较的. == !=, ==操作按照比较顺序比较两个结构体变量的成员变量
+* 和其他可以比较的类型一样,可比较的结构体可以作为 map的键类型
+```
+type address struct{
+    hostname string
+    port    int
+}
+hits := make(map[address]int)
+hits[address{"golang.org", 443}]++  // 前面要加 address{}表明你是啥结构体
+```
+
+### 结构体嵌套和匿名成员
+* 结构体嵌套机制:我们可以将一个命名结构体当做另一个结构体的匿名成员使用.并提供了一种方便的语法,使用简单的表达式(x.f 可以代表连续的成员 x.d.e.f)
+```
+    type Point struct {
+        X,Y int
+    }
+    type Circle struct {
+        Center Point
+        Radius int
+    }
+    type Wheel struct {
+        Circle Circle
+        Spokes int
+}
+
+	var w Wheel
+	w.Circle.Center.X = 8
+	w.Circle.Center.Y = 8
+	w.Circle.Radius = 5
+	w.Spokes = 20
+```
+
+```
+//匿名成员
+    type Point struct {
+        X,Y int
+    }
+    type Circle struct {
+        Point
+        Radius int
+    }
+    type Wheel struct {
+        Circle
+        Spokes int
+    }
+	var w Wheel
+	w.X = 8 // w.Circel.Point.X = 8
+	w.Y = 8
+	w.Radius = 5
+	w.Spokes = 20
+```
+* 结构体字面量必须遵循形状类型的定义
+```
+	var w Wheel
+	w = Wheel{Circle{Point{8, 8}, 5}, 20}
+
+	w2 := Wheel{
+			Circle: Circle{
+			Point{
+					X: 8,
+					Y: 8,
+				},
+				5, // ,必须的
+		},
+		Spokes: 20, // ,必须的
+	}
+
+	fmt.Printf("%v\n", w) // {{{8 8} 5} 20}
+	fmt.Printf("%#v\n", w2) // main.Wheel{Circle:main.Circle{Point:main.Point{X:8, Y:8}, Radius:5}, Spokes:20}
+```
+* 因为匿名成员由隐式的名字,所以不能在一个结构体里定义两个相同类型的匿名成员,会引起冲突.
+* 匿名成员的名字是由他们类型决定的,因此它们的可导出性也是由他们的类型决定的. 即使结构体是不可导出的,我们仍然可以使用快捷方式:w.X = 8 // 等价于 w.circle.point.X = 8 在 circel 和 point 包之外是不允许声明的 .因为他们是不可导出的
+
+## 4.5 JSON
+* json javaScript 对象表示法是一种发送和接收格式化信息的标准.
+* encoding/json encoding.xml encoding/asn1 编码和解码库
+* 只有可导出的成员才可以转换为 JSON 字段,这就是为什么我们将 go 结构体里面的所有成员都定义为首字母大写的
+* 成员标签定义(field tag),一般是一串由由空格分开的标签键值对:key:"value"组成的,因为标签的值使用双引号括起来,所以一般标签都是原生的字符串字面量. 成员的标签通常这样使用: total_count 对应 go 中的 TotalCount. omitempty 表示如果这个成员的值是零或者是空,则不输出这个成员到 json中
+```
+Year int `json:"released"`
+Color bool `json:"color,omitempty"` 
+
+data, err := json.Marshal(movies) // 字节 slice,
+data2, err := json.MarshalIndent(movies, "", "	") // 输出整齐格式化的结果, 第二个定义每行输出的前缀字符串, 第三个是定义缩进的字符串.
+```
+* marshal 的逆操作:将 json字符串解码为 go 数据结构,unmarshal; json.Unmarshal实现. 通过合理的定义 go 的数据结构.我们可以选择将哪部分 json 数据解码到结构体对象中,哪些数据可以丢弃.
+```
+var titles []struct{Title string}
+if err := json.Unmarshal(data, &titles); err != nil {
+		log.Fatalf("JSON unmarshaling failed: %s", err)
+	}
+```
+
+## 文本和 html模板
+* text/template html/template 包实现格式和代码彻底分离,将程序的变量的值代入到文本或者 HTML模板中
+* 模板是一个字符串或者文件,它包含一个或者多个两边用双大括号包围的单元{{...}},这称为操作.每个操作在模板语言里面都对应一个表达式:输出值 选择结构体成员 调用函数 方法,描述控制逻辑,if-else range,实例化其他模板.
+```
+import "text/template"
+const templ = `{{.TotalCount}} issues: // .表示 github.IssuesSearchResult, .TotalCount代表 TotalCount 代表 TotalCount 成员的值.
+{{range .Items}}---------------------
+Number: {{.Number}} // .表示 Items里面连续的元素
+User: {{.User.Login}}
+Title: {{.Title|printf "%.64s"}} // | 会把前一个操作当做下一个操作的输入,和 shell的管道类似. printf 在所有的模板中,就是内置函数 fmt.Sprintf 的同义词.
+Age: {{.CreateAt| daysAgo}} days // daysAgo 使用 time.Since 将 CreatedAt转换为已过去的时间
+{{end}}`
+```
+* html/template 额外地对出现在 HMTL js css url中的字符串进行自动转义.这个功能可以避免生成的 HTML引发长久以来都会有的安全问题:注入攻击.
+
 

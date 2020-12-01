@@ -95,7 +95,8 @@ verb                   描述
 
 \t 制表符 \n 换行符
 %[1] 重复第一个参数
-%#[1]x #输出相应的前缀
+%#[1]x #输出相应的前缀 fmt.Printf("%v\n", w) // {{{8 8} 5} 20}
+                	fmt.Printf("%#v\n", w2) // main.Wheel{Circle:main.Circle{Point:main.Point{X:8, Y:8}, Radius:5}, Spokes:20}
 ```
 
 ## 嵌套 map 出现panic: assignment to entry in nil map 报错
