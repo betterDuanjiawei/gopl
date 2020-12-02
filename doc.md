@@ -144,3 +144,10 @@ m[s][s1] = 1
 in := bufio.NewReader(os.Stdin)
 r, n, err := in.ReadRune() // 返回 rune(解码的字符串 unicode.ReplacementChar 不合法的 utf-8字符,长度是1), nbytes(字节长度), error(错误  io.EOF 文件结束, 其他错误)
 ```
+
+## fmt.Errorf()输出错信息 是 error类型
+* fmt.Errorf() 格式化处理过的附加上下文信息. `return nil, fmt.Errorf("xxx %v", err)`
+
+## 资源显式释放
+* go的垃圾回收机制将回收未使用的内存,但不能指望它会释放未使用的操作系统资源.比如打开的文件以及网络连接.必须显式关闭他们.
+* resp.Body.Close() 保证正确关闭使得网络资源得以释放,即使在发生错误的情况下也必须释放资源

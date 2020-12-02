@@ -418,5 +418,24 @@ Age: {{.CreateAt| daysAgo}} days // daysAgo 使用 time.Since 将 CreatedAt转�
 {{end}}`
 ```
 * html/template 额外地对出现在 HMTL js css url中的字符串进行自动转义.这个功能可以避免生成的 HTML引发长久以来都会有的安全问题:注入攻击.
+* B template.HTML // 受信任的 HTML 属于 html/template 包 不会转义 
+* template
+```
+
+import (
+	"html/template"
+)
+const templ = `<p>A: {{.A}}</p><p>B: {{.B}}</p>`
+	t := template.Must(template.New("escape").Parse(templ))
+	var data struct{
+		A string // 不受信任的纯文本 会转义
+		B template.HTML // 受信任的 HTML 属于 html/template 包 不会转义
+	}
+	data.A = "<b>Hello!</b>"
+	data.B = "<b>Hello!</b>"
+	if err := t.Execute(os.Stdout, data); err != nil {
+		log.Fatal(err)
+	}
+```
 
 
