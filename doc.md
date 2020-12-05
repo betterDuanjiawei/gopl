@@ -151,3 +151,11 @@ r, n, err := in.ReadRune() // 返回 rune(解码的字符串 unicode.Replacement
 ## 资源显式释放
 * go的垃圾回收机制将回收未使用的内存,但不能指望它会释放未使用的操作系统资源.比如打开的文件以及网络连接.必须显式关闭他们.
 * resp.Body.Close() 保证正确关闭使得网络资源得以释放,即使在发生错误的情况下也必须释放资源
+
+## 多个复杂变量的同时命名
+```
+var (
+	mu sync.Mutex
+	mapping = make(map[string]string)
+)
+```

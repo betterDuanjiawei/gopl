@@ -299,3 +299,19 @@ func Parse(input string) (s *Syntax, err error) {
 }
 ```
 * 最安全的做法还是选择性使用recover,宕机过后,需要恢复的情况本来就不多.
+```
+defer func() {
+		switch p := recover(); p {
+		case nil:
+			// 没有宕机
+		case bailout{} :
+			// 预期的宕机
+			err = fmt.Errorf("multiple title elements")
+		default:
+			// 未预期的宕机,继续宕机
+			panic(p)
+		}
+	}()
+
+根据传递的值来判断是否继续宕机
+```
