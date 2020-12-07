@@ -1,5 +1,5 @@
 
-package main
+package oldcode
 import (
     "log"
     "os"

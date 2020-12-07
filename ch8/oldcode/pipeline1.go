@@ -3,7 +3,7 @@
 只 close2,主 goroutine 中会继续<-squares 从中发送,也会导致程序崩溃
 closet1 和 close2都 close,
 */
-package main
+package oldcode
 
 import (
 	"fmt"

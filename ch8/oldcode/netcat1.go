@@ -1,20 +1,20 @@
-package main
+package oldcode
 
 import (
+	"io"
+	"log"
 	"net"
 	"os"
-	"log"
-	"io"
 )
 
 func main() {
-	conn, err := net.Dial("tcp", "localhost:8080")
+	conn, err := net.Dial("tcp", "localhost:8000")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer conn.Close()
-	go mustCopy(os.Stdout, conn)
-	mustCopy(conn, os.Stdin)
+	mustCopy(os.Stdout, conn)
 }
 
 func mustCopy(dst io.Writer, src io.Reader)  {

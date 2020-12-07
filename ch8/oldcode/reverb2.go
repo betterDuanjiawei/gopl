@@ -4,7 +4,7 @@
 还可以通过go 来并发处理一个客户端的多次输入操作
 需要考虑 net.Conn 并发调用的安全性
 */
-package main
+package oldcode
 
 import (
 	"net"

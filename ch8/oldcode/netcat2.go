@@ -1,10 +1,10 @@
-package main
+package oldcode
 
 import (
 	"net"
+	"os"
 	"log"
 	"io"
-	"os"
 )
 
 func main() {
@@ -12,16 +12,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	done := make(chan struct{})
-	go func ()  {
-		io.Copy(os.Stdout, conn)
-		log.Println("done")
-		done <- struct{}{} // 无任何信息,单纯的同步
-	}()
+	defer conn.Close()
+	go mustCopy(os.Stdout, conn)
 	mustCopy(conn, os.Stdin)
-	conn.Close()
-	<-done // 会阻塞等待后台 goroutine 完成
-	log.Println("main goroutine done")
 }
 
 func mustCopy(dst io.Writer, src io.Reader)  {

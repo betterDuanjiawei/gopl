@@ -166,3 +166,26 @@ fmt.Scanf(s, "%f%s", &value, &uint) // 从输入 s中解析一个浮点值value�
 * 可比较的:基础类型和指针
 * 不可比较的:slice map 函数
 * 需要注意的: 接口值和包含接口值的聚合类型时候,需要注意可能崩溃.仅在确认接口值的动态值可以比较的时候,才可以比较接口值
+
+## time.Time.Format()
+time.Time.Format 方法提供了格式化日期和时间信息的方式.它的参数是一个模板.指示如何格式化一个参考时间,具体如 Mon Jan 2 03:04:05PM 2006 UTC-0700这样的形式
+
+## for 循环条件为空
+```
+// 第一个条件为空
+for ; n >0; n-- { // 如果第一个条件为空,那么就是;
+    list := <-worklist
+    for _, link := range list {
+        if !seen[link] {
+            seen[link] = true
+            n++
+            go func(link string) {
+                worklist <- crawl(link)
+            }(link)
+        }
+
+    }
+}
+```
+
+## os.Args[1:]和 flag.Args()的区别?
