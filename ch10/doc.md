@@ -249,3 +249,4 @@ go list -f '{{join .Deps " "}}' strconv
 go list -f '{{.ImportPath}} -> {{join .Imports " "}}' strconv/...
 ```
 * go list 命令对于一次性交互式查询或自动化构建或测试脚本都很有帮助.
+
